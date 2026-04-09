@@ -439,18 +439,30 @@ function App() {
   }, {} as Record<string, Sale[]>);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 to-slate-200">
-      <header className="bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 py-6">
-          <h1 className="text-4xl font-bold">🍾 Anatolia Spring</h1>
-          <p className="text-blue-100">Bottle Sales & Payroll Tracking System</p>
+    <div className="min-h-screen">
+      <header className="sticky top-0 z-50 w-full bg-[#faf8ff]/85 glass-header border-b border-[#e2e7ff]">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-extrabold headline-font bg-gradient-to-br from-[#483ede] to-[#625bf8] bg-clip-text text-transparent">
+              Anatolia Spring
+            </h1>
+            <p className="text-sm text-[#464555] font-medium">Payroll & Attendance Portal</p>
+          </div>
+          <div className="hidden sm:flex items-center gap-3">
+            <div className="bg-[#f2f3ff] px-4 py-2 rounded-lg text-sm font-semibold text-[#3323cc]">
+              {new Date(`${currentMonth}-01`).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+            </div>
+            <button className="primary-gradient text-white px-4 py-2 rounded-lg font-semibold text-sm shadow-lg shadow-indigo-200/60">
+              Export Report
+            </button>
+          </div>
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-8 space-y-6">
+      <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
         {error && (
-          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
-            <p className="text-yellow-700">{error}</p>
+          <div className="bg-[#ffdad6] border-l-4 border-[#ba1a1a] p-4 rounded-lg">
+            <p className="text-[#93000a] font-medium">{error}</p>
           </div>
         )}
 
@@ -488,8 +500,8 @@ function App() {
         />
       </main>
 
-      <footer className="bg-gray-800 text-gray-400 py-4 mt-12">
-        <div className="max-w-7xl mx-auto px-4 text-center text-sm">
+      <footer className="bg-[#eaedff] border-t border-[#dae2fd] text-[#464555] py-5 mt-12">
+        <div className="max-w-7xl mx-auto px-4 text-center text-sm font-medium">
           <p>© 2026 Anatolia Spring. All sales are logged with timestamps for complete transparency.</p>
         </div>
       </footer>

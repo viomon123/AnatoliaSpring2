@@ -41,12 +41,12 @@ export function AttendanceTracker({ attendance, onToggle, currentMonth }: Attend
   });
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
+    <div className="bg-white/95 rounded-xl shadow-lg border border-[#e2e7ff] p-6">
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">📋 Attendance Tracker</h2>
+        <h2 className="text-2xl font-extrabold headline-font text-[#131b2e]">Attendance Tracker</h2>
         <button
           onClick={() => setExpandMonth(!expandMonth)}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
+          className="px-4 py-2 primary-gradient text-white rounded-lg transition"
         >
           {expandMonth ? 'Collapse' : 'Expand'}
         </button>
@@ -54,22 +54,22 @@ export function AttendanceTracker({ attendance, onToggle, currentMonth }: Attend
 
       {/* Monthly Summary */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <h3 className="font-semibold text-gray-700 mb-2">Person 1</h3>
-          <p className="text-3xl font-bold text-blue-600">{person1Days}</p>
-          <p className="text-sm text-gray-600">days present in {monthName}</p>
+        <div className="bg-[#f2f3ff] p-4 rounded-xl border border-[#e2e7ff]">
+          <h3 className="font-semibold text-[#3323cc] mb-2">Person 1</h3>
+          <p className="text-3xl font-bold text-[#483ede]">{person1Days}</p>
+          <p className="text-sm text-[#464555]">days present in {monthName}</p>
         </div>
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-          <h3 className="font-semibold text-gray-700 mb-2">Person 2</h3>
-          <p className="text-3xl font-bold text-purple-600">{person2Days}</p>
-          <p className="text-sm text-gray-600">days present in {monthName}</p>
+        <div className="bg-[#f2f3ff] p-4 rounded-xl border border-[#e2e7ff]">
+          <h3 className="font-semibold text-[#5a00c6] mb-2">Person 2</h3>
+          <p className="text-3xl font-bold text-[#712ae2]">{person2Days}</p>
+          <p className="text-sm text-[#464555]">days present in {monthName}</p>
         </div>
       </div>
 
       {/* Daily Calendar */}
       {expandMonth && (
-        <div className="border-t pt-6">
-          <h3 className="font-semibold text-gray-700 mb-4">Daily Attendance - {monthName}</h3>
+        <div className="border-t border-[#e2e7ff] pt-6">
+          <h3 className="font-semibold text-[#464555] mb-4">Daily Attendance - {monthName}</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {daysInMonth.map(date => {
               const dayAttendance = attendance.find(a => a.date === date);
@@ -78,8 +78,8 @@ export function AttendanceTracker({ attendance, onToggle, currentMonth }: Attend
               const dayNum = dateObj.getDate();
 
               return (
-                <div key={date} className="bg-gray-50 p-4 rounded-lg border border-gray-200">
-                  <p className="font-semibold text-gray-800 mb-3">
+                <div key={date} className="bg-[#f8f7ff] p-4 rounded-xl border border-[#e2e7ff]">
+                  <p className="font-semibold text-[#131b2e] mb-3">
                     {dayName}, {dayNum}
                   </p>
                   
@@ -88,8 +88,8 @@ export function AttendanceTracker({ attendance, onToggle, currentMonth }: Attend
                       onClick={() => onToggle(date, 'person1')}
                       className={`w-full py-2 px-3 rounded text-sm font-medium transition ${
                         dayAttendance?.person1
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          ? 'bg-[#483ede] text-white'
+                          : 'bg-[#eaedff] text-[#464555] hover:bg-[#dae2fd]'
                       }`}
                     >
                       {dayAttendance?.person1 ? '✓ Person 1' : 'Person 1'}
@@ -99,8 +99,8 @@ export function AttendanceTracker({ attendance, onToggle, currentMonth }: Attend
                       onClick={() => onToggle(date, 'person2')}
                       className={`w-full py-2 px-3 rounded text-sm font-medium transition ${
                         dayAttendance?.person2
-                          ? 'bg-purple-500 text-white'
-                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                          ? 'bg-[#712ae2] text-white'
+                          : 'bg-[#eaedff] text-[#464555] hover:bg-[#dae2fd]'
                       }`}
                     >
                       {dayAttendance?.person2 ? '✓ Person 2' : 'Person 2'}

@@ -102,14 +102,14 @@ export function PayrollSummary({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">💰 Payroll Summary - {monthName}</h2>
+    <div className="bg-white/95 rounded-xl shadow-lg border border-[#e2e7ff] p-6">
+      <h2 className="text-2xl font-extrabold headline-font text-[#131b2e] mb-6">Payroll Summary - {monthName}</h2>
 
-      <div className="mb-6 p-4 rounded-lg border border-amber-200 bg-amber-50">
+      <div className="mb-6 p-4 rounded-xl border border-[#c7c4d7] bg-[#f2f3ff]">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
           <div>
-            <p className="font-semibold text-amber-800">Advance Controls</p>
-            <p className="text-sm text-amber-700">
+            <p className="font-semibold text-[#3323cc]">Cash Advance Secure Entry</p>
+            <p className="text-sm text-[#464555]">
               {isAdvanceUnlocked
                 ? 'Unlocked: You can edit salary advances.'
                 : 'Locked: Enter PIN to allow advance changes.'}
@@ -119,7 +119,7 @@ export function PayrollSummary({
           {isAdvanceUnlocked ? (
             <button
               onClick={() => setIsAdvanceUnlocked(false)}
-              className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 transition"
+              className="px-4 py-2 bg-[#464555] text-white rounded-lg hover:opacity-90 transition"
             >
               Lock Advances
             </button>
@@ -133,11 +133,11 @@ export function PayrollSummary({
                   if (pinError) setPinError('');
                 }}
                 placeholder="Enter PIN"
-                className="px-3 py-2 border rounded"
+                className="px-3 py-2 border border-[#c7c4d7] rounded-lg bg-white"
               />
               <button
                 onClick={unlockAdvanceInputs}
-                className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition"
+                className="px-4 py-2 primary-gradient text-white rounded-lg transition"
               >
                 Unlock
               </button>
@@ -149,42 +149,42 @@ export function PayrollSummary({
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {/* Total Sales */}
-        <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-          <p className="text-sm text-gray-600 mb-1">Total Sales</p>
-          <p className="text-3xl font-bold text-green-600">₱{totalRevenue.toFixed(2)}</p>
-          <p className="text-xs text-gray-500 mt-2">{totalBottles} bottles</p>
+        <div className="bg-[#f2f3ff] p-4 rounded-xl border border-[#e2e7ff]">
+          <p className="text-sm text-[#464555] mb-1">Total Sales</p>
+          <p className="text-3xl font-bold text-[#483ede]">₱{totalRevenue.toFixed(2)}</p>
+          <p className="text-xs text-[#767586] mt-2">{totalBottles} bottles</p>
         </div>
 
         {/* Base Salary Calculation */}
-        <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-          <p className="text-sm text-gray-600 mb-1">Base Salary Pool</p>
-          <p className="text-3xl font-bold text-blue-600">₱{baseSalary.toFixed(2)}</p>
-          <p className="text-xs text-gray-500 mt-2">{totalBottles} × ₱10</p>
+        <div className="bg-[#f2f3ff] p-4 rounded-xl border border-[#e2e7ff]">
+          <p className="text-sm text-[#464555] mb-1">Base Salary Pool</p>
+          <p className="text-3xl font-bold text-[#005f89]">₱{baseSalary.toFixed(2)}</p>
+          <p className="text-xs text-[#767586] mt-2">{totalBottles} × ₱10</p>
         </div>
 
         {/* Bonus (20% of base) */}
-        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-          <p className="text-sm text-gray-600 mb-1">Payroll Bonus (20%)</p>
-          <p className="text-3xl font-bold text-purple-600">₱{bonus.toFixed(2)}</p>
-          <p className="text-xs text-gray-500 mt-2">Total employee salaries</p>
+        <div className="bg-[#f2f3ff] p-4 rounded-xl border border-[#e2e7ff]">
+          <p className="text-sm text-[#464555] mb-1">Payroll Bonus (20%)</p>
+          <p className="text-3xl font-bold text-[#712ae2]">₱{bonus.toFixed(2)}</p>
+          <p className="text-xs text-[#767586] mt-2">Total employee salaries</p>
         </div>
 
         {/* Total Expenses */}
-        <div className="bg-red-50 p-4 rounded-lg border border-red-200">
-          <p className="text-sm text-gray-600 mb-1">Total Expenses</p>
-          <p className="text-3xl font-bold text-red-600">₱{totalExpenses.toFixed(2)}</p>
-          <p className="text-xs text-gray-500 mt-2">
+        <div className="bg-[#f2f3ff] p-4 rounded-xl border border-[#e2e7ff]">
+          <p className="text-sm text-[#464555] mb-1">Total Expenses</p>
+          <p className="text-3xl font-bold text-[#ba1a1a]">₱{totalExpenses.toFixed(2)}</p>
+          <p className="text-xs text-[#767586] mt-2">
             Water: ₱{waterExpenses.toFixed(2)} | House: ₱{houseExpenses.toFixed(2)}
           </p>
         </div>
       </div>
 
       {/* Employee Salaries */}
-      <div className="border-t pt-6 mb-6">
-        <h3 className="font-semibold text-gray-800 mb-4">Employee Salaries</h3>
+      <div className="border-t border-[#e2e7ff] pt-6 mb-6">
+        <h3 className="font-semibold text-[#131b2e] mb-4">Employee Salaries</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-            <h4 className="font-semibold text-gray-700 mb-3">Person 1</h4>
+          <div className="bg-[#f2f3ff] p-4 rounded-xl border border-[#e2e7ff]">
+            <h4 className="font-semibold text-[#3323cc] mb-3">Person 1</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Attendance Days:</span>
@@ -203,12 +203,12 @@ export function PayrollSummary({
                   value={advances.person1}
                   onChange={(e) => onAdvanceChange('person1', Number(e.target.value))}
                   disabled={!isAdvanceUnlocked}
-                  className="w-32 px-2 py-1 border rounded text-right"
+                  className="w-32 px-2 py-1 border border-[#c7c4d7] rounded-lg text-right bg-white"
                 />
               </div>
               <div className="border-t pt-2 flex justify-between">
                 <span className="text-gray-700 font-semibold">Gross Salary:</span>
-                <span className="font-semibold text-blue-600">₱{person1Salary.toFixed(2)}</span>
+                <span className="font-semibold text-[#3323cc]">₱{person1Salary.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Less Advance:</span>
@@ -216,13 +216,13 @@ export function PayrollSummary({
               </div>
               <div className="border-t pt-2 flex justify-between">
                 <span className="text-gray-700 font-semibold">Net Salary:</span>
-                <span className="text-2xl font-bold text-blue-700">₱{person1NetSalary.toFixed(2)}</span>
+                <span className="text-2xl font-bold text-[#0f0069]">₱{person1NetSalary.toFixed(2)}</span>
               </div>
             </div>
           </div>
 
-          <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-            <h4 className="font-semibold text-gray-700 mb-3">Person 2</h4>
+          <div className="bg-[#f2f3ff] p-4 rounded-xl border border-[#e2e7ff]">
+            <h4 className="font-semibold text-[#5a00c6] mb-3">Person 2</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-600">Attendance Days:</span>
@@ -241,12 +241,12 @@ export function PayrollSummary({
                   value={advances.person2}
                   onChange={(e) => onAdvanceChange('person2', Number(e.target.value))}
                   disabled={!isAdvanceUnlocked}
-                  className="w-32 px-2 py-1 border rounded text-right"
+                  className="w-32 px-2 py-1 border border-[#c7c4d7] rounded-lg text-right bg-white"
                 />
               </div>
               <div className="border-t pt-2 flex justify-between">
                 <span className="text-gray-700 font-semibold">Gross Salary:</span>
-                <span className="font-semibold text-purple-600">₱{person2Salary.toFixed(2)}</span>
+                <span className="font-semibold text-[#5a00c6]">₱{person2Salary.toFixed(2)}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600">Less Advance:</span>
@@ -254,7 +254,7 @@ export function PayrollSummary({
               </div>
               <div className="border-t pt-2 flex justify-between">
                 <span className="text-gray-700 font-semibold">Net Salary:</span>
-                <span className="text-2xl font-bold text-purple-700">₱{person2NetSalary.toFixed(2)}</span>
+                <span className="text-2xl font-bold text-[#25005a]">₱{person2NetSalary.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -262,14 +262,14 @@ export function PayrollSummary({
       </div>
 
       {/* Net Profit */}
-      <div className="bg-gradient-to-r from-gray-50 to-gray-100 p-4 rounded-lg border border-gray-300">
+      <div className="bg-gradient-to-r from-[#eaedff] to-[#f2f3ff] p-4 rounded-xl border border-[#dae2fd]">
         <div className="flex justify-between items-center">
-          <h3 className="font-semibold text-gray-800">Net Profit (After Salaries & Expenses)</h3>
-          <p className="text-3xl font-bold text-gray-800">
+          <h3 className="font-semibold text-[#131b2e]">Net Profit (After Salaries & Expenses)</h3>
+          <p className="text-3xl font-bold text-[#131b2e]">
             ₱{netProfit.toFixed(2)}
           </p>
         </div>
-        <div className="mt-3 text-xs text-gray-600 space-y-1">
+        <div className="mt-3 text-xs text-[#464555] space-y-1">
           <p>Revenue: ₱{totalRevenue.toFixed(2)} - Payroll: ₱{bonus.toFixed(2)} - Expenses: ₱{totalExpenses.toFixed(2)}</p>
         </div>
       </div>

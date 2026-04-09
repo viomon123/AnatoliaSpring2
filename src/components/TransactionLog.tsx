@@ -24,12 +24,12 @@ export function TransactionLog({ sales, dealers = [], onDelete, isLoading = fals
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-gray-800 mb-4">Transaction Log</h2>
+    <div className="bg-white/95 p-6 rounded-xl shadow-lg border border-[#e2e7ff]">
+      <h2 className="text-2xl font-extrabold headline-font text-[#131b2e] mb-4">Transaction Log</h2>
       
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-gray-100 border-b-2">
+          <thead className="bg-[#f2f3ff] border-b border-[#dae2fd]">
             <tr>
               <th className="px-4 py-2 text-left">Date & Time</th>
               <th className="px-4 py-2 text-left">Type</th>
@@ -42,26 +42,26 @@ export function TransactionLog({ sales, dealers = [], onDelete, isLoading = fals
           <tbody>
             {sales.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center text-gray-500 py-8">
+                <td colSpan={6} className="text-center text-[#767586] py-8">
                   No transactions yet
                 </td>
               </tr>
             ) : (
               sales.map(sale => (
-                <tr key={sale.id} className="border-b hover:bg-gray-50">
+                <tr key={sale.id} className="border-b border-[#e2e7ff] hover:bg-[#f8f7ff]">
                   <td className="px-4 py-3">{formatDateTime(sale.created_at)}</td>
                   <td className="px-4 py-3">
                     <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                       sale.dealer_id 
-                        ? 'bg-purple-100 text-purple-800' 
-                        : 'bg-blue-100 text-blue-800'
+                        ? 'bg-[#eaddff] text-[#5a00c6]' 
+                        : 'bg-[#e2dfff] text-[#3323cc]'
                     }`}>
                       {getSaleTypeLabel(sale)}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center font-semibold">{sale.quantity}</td>
                   <td className="px-4 py-3 text-right">{formatCurrency(sale.price_per_bottle)}</td>
-                  <td className="px-4 py-3 text-right font-bold text-green-600">
+                  <td className="px-4 py-3 text-right font-bold text-[#005f89]">
                     {formatCurrency(sale.total_amount)}
                   </td>
                   <td className="px-4 py-3 text-center">
@@ -69,7 +69,7 @@ export function TransactionLog({ sales, dealers = [], onDelete, isLoading = fals
                       <button
                         onClick={() => onDelete(sale.id)}
                         disabled={isLoading}
-                        className="p-1 text-red-600 hover:bg-red-50 rounded disabled:text-gray-300"
+                        className="p-1 text-[#ba1a1a] hover:bg-[#ffdad6] rounded disabled:text-gray-300"
                         title="Delete transaction"
                       >
                         <Trash2 size={18} />
