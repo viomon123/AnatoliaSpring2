@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Sale, Expense } from '../types';
 
 interface Attendance {
@@ -12,6 +13,12 @@ interface PayrollSummaryProps {
   expenses: Expense[];
   salaryPerBottle: number;
   attendance: Attendance[];
+  advances: {
+    person1: number;
+    person2: number;
+  };
+  onAdvanceChange: (person: 'person1' | 'person2', amount: number) => void;
+  advancePin: string;
   currentMonth: string;
 }
 
@@ -20,8 +27,15 @@ export function PayrollSummary({
   dealerSales,
   expenses,
   attendance,
+  advances,
+  onAdvanceChange,
+  advancePin,
   currentMonth
 }: PayrollSummaryProps) {
+  const [isAdvanceUnlocked, setIsAdvanceUnlocked] = useState(false);
+  const [pinInput, setPinInput] = useState('');
+  const [pinError, setPinError] = useState('');
+
   // Calculate total bottles sold
   const totalBottles = sales.reduce((sum, sale) => sum + sale.quantity, 0);
 
@@ -44,6 +58,8 @@ export function PayrollSummary({
 
   const person1Salary = bonus * person1Share;
   const person2Salary = bonus * person2Share;
+  const person1NetSalary = person1Salary - advances.person1;
+  const person2NetSalary = person2Salary - advances.person2;
 
   // Calculate expenses summary
   const waterExpenses = expenses
@@ -74,9 +90,62 @@ export function PayrollSummary({
     year: 'numeric'
   });
 
+  const unlockAdvanceInputs = () => {
+    if (pinInput === advancePin) {
+      setIsAdvanceUnlocked(true);
+      setPinError('');
+      setPinInput('');
+      return;
+    }
+
+    setPinError('Incorrect PIN');
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">💰 Payroll Summary - {monthName}</h2>
+
+      <div className="mb-6 p-4 rounded-lg border border-amber-200 bg-amber-50">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <p className="font-semibold text-amber-800">Advance Controls</p>
+            <p className="text-sm text-amber-700">
+              {isAdvanceUnlocked
+                ? 'Unlocked: You can edit salary advances.'
+                : 'Locked: Enter PIN to allow advance changes.'}
+            </p>
+          </div>
+
+          {isAdvanceUnlocked ? (
+            <button
+              onClick={() => setIsAdvanceUnlocked(false)}
+              className="px-4 py-2 bg-gray-700 text-white rounded hover:bg-gray-800 transition"
+            >
+              Lock Advances
+            </button>
+          ) : (
+            <div className="flex items-center gap-2">
+              <input
+                type="password"
+                value={pinInput}
+                onChange={(e) => {
+                  setPinInput(e.target.value);
+                  if (pinError) setPinError('');
+                }}
+                placeholder="Enter PIN"
+                className="px-3 py-2 border rounded"
+              />
+              <button
+                onClick={unlockAdvanceInputs}
+                className="px-4 py-2 bg-amber-600 text-white rounded hover:bg-amber-700 transition"
+              >
+                Unlock
+              </button>
+            </div>
+          )}
+        </div>
+        {pinError && <p className="text-sm text-red-600 mt-2">{pinError}</p>}
+      </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {/* Total Sales */}
@@ -125,9 +194,29 @@ export function PayrollSummary({
                 <span className="text-gray-600">Share of Bonus:</span>
                 <span className="font-semibold">{(person1Share * 100).toFixed(1)}%</span>
               </div>
+              <div className="flex justify-between items-center gap-3">
+                <label className="text-gray-600">Advance:</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={advances.person1}
+                  onChange={(e) => onAdvanceChange('person1', Number(e.target.value))}
+                  disabled={!isAdvanceUnlocked}
+                  className="w-32 px-2 py-1 border rounded text-right"
+                />
+              </div>
               <div className="border-t pt-2 flex justify-between">
-                <span className="text-gray-700 font-semibold">Salary:</span>
-                <span className="text-2xl font-bold text-blue-600">₱{person1Salary.toFixed(2)}</span>
+                <span className="text-gray-700 font-semibold">Gross Salary:</span>
+                <span className="font-semibold text-blue-600">₱{person1Salary.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Less Advance:</span>
+                <span className="font-semibold text-red-600">₱{advances.person1.toFixed(2)}</span>
+              </div>
+              <div className="border-t pt-2 flex justify-between">
+                <span className="text-gray-700 font-semibold">Net Salary:</span>
+                <span className="text-2xl font-bold text-blue-700">₱{person1NetSalary.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -143,9 +232,29 @@ export function PayrollSummary({
                 <span className="text-gray-600">Share of Bonus:</span>
                 <span className="font-semibold">{(person2Share * 100).toFixed(1)}%</span>
               </div>
+              <div className="flex justify-between items-center gap-3">
+                <label className="text-gray-600">Advance:</label>
+                <input
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value={advances.person2}
+                  onChange={(e) => onAdvanceChange('person2', Number(e.target.value))}
+                  disabled={!isAdvanceUnlocked}
+                  className="w-32 px-2 py-1 border rounded text-right"
+                />
+              </div>
               <div className="border-t pt-2 flex justify-between">
-                <span className="text-gray-700 font-semibold">Salary:</span>
-                <span className="text-2xl font-bold text-purple-600">₱{person2Salary.toFixed(2)}</span>
+                <span className="text-gray-700 font-semibold">Gross Salary:</span>
+                <span className="font-semibold text-purple-600">₱{person2Salary.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-600">Less Advance:</span>
+                <span className="font-semibold text-red-600">₱{advances.person2.toFixed(2)}</span>
+              </div>
+              <div className="border-t pt-2 flex justify-between">
+                <span className="text-gray-700 font-semibold">Net Salary:</span>
+                <span className="text-2xl font-bold text-purple-700">₱{person2NetSalary.toFixed(2)}</span>
               </div>
             </div>
           </div>

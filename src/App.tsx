@@ -12,6 +12,7 @@ import './App.css';
 
 // Salary configuration: 2 pesos per bottle (20% of 10 pesos)
 const SALARY_PER_BOTTLE = 2;
+const ADVANCE_PIN = import.meta.env.VITE_ADVANCE_PIN || '1234';
 
 interface Attendance {
   date: string;
@@ -24,6 +25,10 @@ interface MonthlyData {
   sales: Sale[];
   expenses: Expense[];
   attendance: Attendance[];
+  advances?: {
+    person1: number;
+    person2: number;
+  };
 }
 
 function App() {
@@ -31,6 +36,7 @@ function App() {
   const [dealers, setDealers] = useState<Dealer[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [attendance, setAttendance] = useState<Attendance[]>([]);
+  const [advances, setAdvances] = useState({ person1: 0, person2: 0 });
   const [, setMonthlyData] = useState<MonthlyData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -70,11 +76,13 @@ function App() {
         setSales(monthlyDataFromDb.sales || []);
         setExpenses(monthlyDataFromDb.expenses || []);
         setAttendance(monthlyDataFromDb.attendance || []);
+        setAdvances(monthlyDataFromDb.advances || { person1: 0, person2: 0 });
       } else {
         // Initialize empty data for new month
         setSales([]);
         setExpenses([]);
         setAttendance([]);
+        setAdvances({ person1: 0, person2: 0 });
       }
 
       // Load all historical monthly data
@@ -95,7 +103,7 @@ function App() {
   async function saveMonthlyData() {
     if (!supabase) {
       // Local storage fallback
-      const data: MonthlyData = { month: currentMonth, sales, expenses, attendance };
+      const data: MonthlyData = { month: currentMonth, sales, expenses, attendance, advances };
       const existing = JSON.parse(localStorage.getItem('monthlyData') || '[]');
       const filtered = existing.filter((m: MonthlyData) => m.month !== currentMonth);
       localStorage.setItem('monthlyData', JSON.stringify([...filtered, data]));
@@ -103,7 +111,7 @@ function App() {
     }
 
     try {
-      const dataToSave: MonthlyData = { month: currentMonth, sales, expenses, attendance };
+      const dataToSave: MonthlyData = { month: currentMonth, sales, expenses, attendance, advances };
       const { error } = await supabase
         .from('monthly_data')
         .upsert([dataToSave], { onConflict: 'month' });
@@ -120,7 +128,15 @@ function App() {
       saveMonthlyData();
     }, 1000);
     return () => clearTimeout(timer);
-  }, [sales, expenses, attendance]);
+  }, [sales, expenses, attendance, advances]);
+
+  function handleAdvanceChange(person: 'person1' | 'person2', amount: number) {
+    const sanitizedAmount = Number.isFinite(amount) && amount > 0 ? amount : 0;
+    setAdvances(prev => ({
+      ...prev,
+      [person]: sanitizedAmount
+    }));
+  }
 
   async function handleAddSale(quantity: number) {
     if (!supabase) {
@@ -452,6 +468,9 @@ function App() {
           expenses={expenses} 
           salaryPerBottle={SALARY_PER_BOTTLE}
           attendance={attendance}
+          advances={advances}
+          onAdvanceChange={handleAdvanceChange}
+          advancePin={ADVANCE_PIN}
           currentMonth={currentMonth}
         />
         
