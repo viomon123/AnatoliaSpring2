@@ -1,27 +1,26 @@
 import { Sale, Expense } from '../types';
+
 const SALARY_PERCENTAGE = 0.2;
-const MAX_BOTTLE_VALUE_FOR_SALARY = 10;
+const BOTTLE_RATE = 10;
 const PERSON1_SHARE = 0.55;
 const PERSON2_SHARE = 0.45;
 
 export function calculatePayroll(sales: Sale[], expenses: Expense[] = []): { person1: number; person2: number; totalSalary: number; netSales: number; totalExpenses: number } {
   let totalSaleAmount = 0;
+  let totalBottles = 0;
 
-  // Calculate total sale amount
   sales.forEach(sale => {
     totalSaleAmount += sale.total_amount;
+    totalBottles += sale.quantity;
   });
 
-  // Calculate total expenses
   const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
   
-  // Net sales after expenses
   const netSales = totalSaleAmount - totalExpenses;
 
-  // Salary is 20% of the net sales amount
-  const totalSalary = Math.max(0, netSales * SALARY_PERCENTAGE);
+  // Salary is 20% of (total bottles × 10)
+  const totalSalary = totalBottles * BOTTLE_RATE * SALARY_PERCENTAGE;
 
-  // Split 55/45
   const person1 = totalSalary * PERSON1_SHARE;
   const person2 = totalSalary * PERSON2_SHARE;
 
@@ -33,7 +32,7 @@ export function calculateDealerPayroll(dealerSales: Sale[]): { dealer: number; c
   let companyTotal = 0;
 
   dealerSales.forEach(sale => {
-    const bottlesForSalary = sale.quantity * Math.min(MAX_BOTTLE_VALUE_FOR_SALARY, sale.price_per_bottle);
+    const bottlesForSalary = sale.quantity * Math.min(10, sale.price_per_bottle);
     const salaryPortion = bottlesForSalary * SALARY_PERCENTAGE;
     dealerTotal += salaryPortion;
     companyTotal += sale.total_amount * SALARY_PERCENTAGE - salaryPortion;
