@@ -7,14 +7,41 @@ import { TransactionLog } from './components/TransactionLog';
 import { PayrollSummary } from './components/PayrollSummary';
 import { DailyStats } from './components/DailyStats';
 import { ExpenseTracker } from './components/ExpenseTracker';
+import { AttendanceTracker } from './AttendanceTracker';
 import './App.css';
+
+// Salary configuration: 2 pesos per bottle (20% of 10 pesos)
+const SALARY_PER_BOTTLE = 2;
+
+interface Attendance {
+  date: string;
+  person1: boolean;
+  person2: boolean;
+}
+
+interface MonthlyData {
+  month: string; // YYYY-MM format
+  sales: Sale[];
+  expenses: Expense[];
+  attendance: Attendance[];
+}
 
 function App() {
   const [sales, setSales] = useState<Sale[]>([]);
   const [dealers, setDealers] = useState<Dealer[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [attendance, setAttendance] = useState<Attendance[]>([]);
+  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Get current month in YYYY-MM format
+  const getCurrentMonth = () => {
+    const now = new Date();
+    return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  };
+
+  const currentMonth = getCurrentMonth();
 
   useEffect(() => {
     loadData();
@@ -32,21 +59,31 @@ function App() {
       
       if (dealersData) setDealers(dealersData);
 
-      // Load sales
-      const { data: salesData } = await supabase
-        .from('sales')
+      // Load monthly data
+      const { data: monthlyDataFromDb } = await supabase
+        .from('monthly_data')
         .select('*')
-        .order('created_at', { ascending: false });
-      
-      if (salesData) setSales(salesData);
+        .eq('month', currentMonth)
+        .single();
 
-      // Load expenses
-      const { data: expensesData } = await supabase
-        .from('expenses')
+      if (monthlyDataFromDb) {
+        setSales(monthlyDataFromDb.sales || []);
+        setExpenses(monthlyDataFromDb.expenses || []);
+        setAttendance(monthlyDataFromDb.attendance || []);
+      } else {
+        // Initialize empty data for new month
+        setSales([]);
+        setExpenses([]);
+        setAttendance([]);
+      }
+
+      // Load all historical monthly data
+      const { data: allMonthlyData } = await supabase
+        .from('monthly_data')
         .select('*')
-        .order('created_at', { ascending: false });
+        .order('month', { ascending: false });
       
-      if (expensesData) setExpenses(expensesData);
+      if (allMonthlyData) setMonthlyData(allMonthlyData);
     } catch (err) {
       console.error('Error loading data:', err);
       setError('Failed to load data. Make sure Supabase is configured.');
@@ -54,6 +91,36 @@ function App() {
       setIsLoading(false);
     }
   }
+
+  async function saveMonthlyData() {
+    if (!supabase) {
+      // Local storage fallback
+      const data: MonthlyData = { month: currentMonth, sales, expenses, attendance };
+      const existing = JSON.parse(localStorage.getItem('monthlyData') || '[]');
+      const filtered = existing.filter((m: MonthlyData) => m.month !== currentMonth);
+      localStorage.setItem('monthlyData', JSON.stringify([...filtered, data]));
+      return;
+    }
+
+    try {
+      const dataToSave: MonthlyData = { month: currentMonth, sales, expenses, attendance };
+      const { error } = await supabase
+        .from('monthly_data')
+        .upsert([dataToSave], { onConflict: 'month' });
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Error saving monthly data:', err);
+    }
+  }
+
+  // Auto-save when data changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      saveMonthlyData();
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [sales, expenses, attendance]);
 
   async function handleAddSale(quantity: number) {
     if (!supabase) {
@@ -256,6 +323,30 @@ function App() {
     }
   }
 
+  async function handleAttendanceToggle(date: string, person: 'person1' | 'person2') {
+    const existingAttendance = attendance.find(a => a.date === date);
+    
+    let updated: Attendance;
+    if (existingAttendance) {
+      updated = {
+        ...existingAttendance,
+        [person]: !existingAttendance[person]
+      };
+      setAttendance(attendance.map(a => a.date === date ? updated : a));
+    } else {
+      updated = {
+        date,
+        person1: person === 'person1',
+        person2: person === 'person2'
+      };
+      setAttendance([...attendance, updated]);
+    }
+  }
+
+  function getAttendanceForDate(date: string): Attendance | undefined {
+    return attendance.find(a => a.date === date);
+  }
+
   // Local storage fallback functions
   function addSaleLocal(quantity: number) {
     const newSale: Sale = {
@@ -359,7 +450,20 @@ function App() {
           </div>
         </div>
 
-        <PayrollSummary sales={sales} dealerSales={dealerSales} expenses={expenses} />
+        <PayrollSummary 
+          sales={sales} 
+          dealerSales={dealerSales} 
+          expenses={expenses} 
+          salaryPerBottle={SALARY_PER_BOTTLE}
+          attendance={attendance}
+          currentMonth={currentMonth}
+        />
+        
+        <AttendanceTracker 
+          attendance={attendance} 
+          onToggle={handleAttendanceToggle}
+          currentMonth={currentMonth}
+        />
       </main>
 
       <footer className="bg-gray-800 text-gray-400 py-4 mt-12">
