@@ -19,7 +19,6 @@ export function PayrollSummary({
   sales,
   dealerSales,
   expenses,
-  salaryPerBottle,
   attendance,
   currentMonth
 }: PayrollSummaryProps) {
