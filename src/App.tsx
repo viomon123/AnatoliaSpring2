@@ -31,7 +31,7 @@ function App() {
   const [dealers, setDealers] = useState<Dealer[]>([]);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [attendance, setAttendance] = useState<Attendance[]>([]);
-  const [monthlyData, setMonthlyData] = useState<MonthlyData[]>([]);
+  const [, setMonthlyData] = useState<MonthlyData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -341,10 +341,6 @@ function App() {
       };
       setAttendance([...attendance, updated]);
     }
-  }
-
-  function getAttendanceForDate(date: string): Attendance | undefined {
-    return attendance.find(a => a.date === date);
   }
 
   // Local storage fallback functions
