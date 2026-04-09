@@ -1,15 +1,28 @@
 import type {} from 'react';
-import { Sale } from '../types';
+import { Dealer, Sale } from '../types';
 import { formatCurrency, formatDateTime } from '../utils/calculations';
 import { Trash2 } from 'lucide-react';
 
 interface TransactionLogProps {
   sales: Sale[];
+  dealers?: Dealer[];
   onDelete?: (saleId: string) => void;
   isLoading?: boolean;
 }
 
-export function TransactionLog({ sales, onDelete, isLoading = false }: TransactionLogProps) {
+export function TransactionLog({ sales, dealers = [], onDelete, isLoading = false }: TransactionLogProps) {
+  const getSaleTypeLabel = (sale: Sale) => {
+    if (!sale.dealer_id) {
+      return 'Regular';
+    }
+
+    if (sale.dealer_name) {
+      return sale.dealer_name;
+    }
+
+    return dealers.find(d => d.id === sale.dealer_id)?.name || 'Dealer';
+  };
+
   return (
     <div className="bg-white p-6 rounded-lg shadow-lg">
       <h2 className="text-2xl font-bold text-gray-800 mb-4">Transaction Log</h2>
@@ -43,7 +56,7 @@ export function TransactionLog({ sales, onDelete, isLoading = false }: Transacti
                         ? 'bg-purple-100 text-purple-800' 
                         : 'bg-blue-100 text-blue-800'
                     }`}>
-                      {sale.dealer_name || (sale.price_per_bottle === 15 ? 'Regular' : 'Dealer')}
+                      {getSaleTypeLabel(sale)}
                     </span>
                   </td>
                   <td className="px-4 py-3 text-center font-semibold">{sale.quantity}</td>

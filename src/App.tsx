@@ -439,7 +439,7 @@ function App() {
         
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
-            <TransactionLog sales={sales} onDelete={handleDeleteSale} isLoading={isLoading} />
+            <TransactionLog sales={sales} dealers={dealers} onDelete={handleDeleteSale} isLoading={isLoading} />
           </div>
           <div>
             <DealerManager dealers={dealers} sales={sales} onAdd={handleAddDealer} onAddBottles={handleAddBottlesByDealer} onDelete={handleDeleteDealer} isLoading={isLoading} />
