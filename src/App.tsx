@@ -70,7 +70,7 @@ function App() {
         .from('monthly_data')
         .select('*')
         .eq('month', currentMonth)
-        .single();
+        .maybeSingle();
 
       if (monthlyDataFromDb) {
         setSales(monthlyDataFromDb.sales || []);
@@ -111,12 +111,19 @@ function App() {
     }
 
     try {
-      const dataToSave: MonthlyData = { month: currentMonth, sales, expenses, attendance, advances };
+      const dataWithAdvances: MonthlyData = { month: currentMonth, sales, expenses, attendance, advances };
       const { error } = await supabase
         .from('monthly_data')
-        .upsert([dataToSave], { onConflict: 'month' });
+        .upsert([dataWithAdvances], { onConflict: 'month' });
 
-      if (error) throw error;
+      if (error) {
+        // Backward-compatible fallback for DBs that do not yet have "advances" column.
+        const { error: fallbackError } = await supabase
+          .from('monthly_data')
+          .upsert([{ month: currentMonth, sales, expenses, attendance }], { onConflict: 'month' });
+
+        if (fallbackError) throw fallbackError;
+      }
     } catch (err) {
       console.error('Error saving monthly data:', err);
     }
