@@ -48,16 +48,35 @@ export function PayrollSummary({
   // Calculate attendance days
   const person1Days = attendance.filter(a => a.person1).length;
   const person2Days = attendance.filter(a => a.person2).length;
-  const totalAttendanceDays = person1Days + person2Days;
+  const presentDays = attendance.filter(a => a.person1 || a.person2);
 
-  // Calculate salary distribution based on attendance
-  // If both attended equally, split 50-50. Otherwise proportional.
-  const totalAttendanceShare = totalAttendanceDays || 1; // Prevent division by zero
-  const person1Share = totalAttendanceDays > 0 ? person1Days / totalAttendanceShare : 0.5;
-  const person2Share = totalAttendanceDays > 0 ? person2Days / totalAttendanceShare : 0.5;
+  // Base split: Person 1 = 55%, Person 2 = 45%.
+  // Day rule: if one person is absent and the other is present, that present person gets 100% for that day.
+  let person1Salary = bonus * 0.55;
+  let person2Salary = bonus * 0.45;
 
-  const person1Salary = bonus * person1Share;
-  const person2Salary = bonus * person2Share;
+  if (presentDays.length > 0) {
+    const dayShare = bonus / presentDays.length;
+    let person1DailyTotal = 0;
+    let person2DailyTotal = 0;
+
+    presentDays.forEach(day => {
+      if (day.person1 && day.person2) {
+        person1DailyTotal += dayShare * 0.55;
+        person2DailyTotal += dayShare * 0.45;
+      } else if (day.person1) {
+        person1DailyTotal += dayShare;
+      } else if (day.person2) {
+        person2DailyTotal += dayShare;
+      }
+    });
+
+    person1Salary = person1DailyTotal;
+    person2Salary = person2DailyTotal;
+  }
+
+  const person1Share = bonus > 0 ? person1Salary / bonus : 0;
+  const person2Share = bonus > 0 ? person2Salary / bonus : 0;
   const person1NetSalary = person1Salary - advances.person1;
   const person2NetSalary = person2Salary - advances.person2;
 

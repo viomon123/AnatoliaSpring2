@@ -30,6 +30,8 @@ export function AttendanceTracker({ attendance, onToggle, currentMonth }: Attend
   };
 
   const daysInMonth = getDaysInMonth();
+  const today = new Date().toISOString().split('T')[0];
+  const todayAttendance = attendance.find(a => a.date === today);
 
   // Calculate attendance summary
   const person1Days = attendance.filter(a => a.person1).length;
@@ -69,46 +71,39 @@ export function AttendanceTracker({ attendance, onToggle, currentMonth }: Attend
       {/* Daily Calendar */}
       {expandMonth && (
         <div className="border-t border-[#e2e7ff] pt-6">
-          <h3 className="font-semibold text-[#464555] mb-4">Daily Attendance - {monthName}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {daysInMonth.map(date => {
-              const dayAttendance = attendance.find(a => a.date === date);
-              const dateObj = new Date(date);
-              const dayName = dateObj.toLocaleDateString('en-US', { weekday: 'short' });
-              const dayNum = dateObj.getDate();
+          <h3 className="font-semibold text-[#464555] mb-4">Today Attendance Only</h3>
+          <div className="bg-[#f8f7ff] p-4 rounded-xl border border-[#e2e7ff]">
+            <p className="font-semibold text-[#131b2e] mb-3">
+              {new Date(today).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}
+            </p>
 
-              return (
-                <div key={date} className="bg-[#f8f7ff] p-4 rounded-xl border border-[#e2e7ff]">
-                  <p className="font-semibold text-[#131b2e] mb-3">
-                    {dayName}, {dayNum}
-                  </p>
-                  
-                  <div className="space-y-2">
-                    <button
-                      onClick={() => onToggle(date, 'person1')}
-                      className={`w-full py-2 px-3 rounded text-sm font-medium transition ${
-                        dayAttendance?.person1
-                          ? 'bg-[#483ede] text-white'
-                          : 'bg-[#eaedff] text-[#464555] hover:bg-[#dae2fd]'
-                      }`}
-                    >
-                      {dayAttendance?.person1 ? '✓ Person 1' : 'Person 1'}
-                    </button>
-                    
-                    <button
-                      onClick={() => onToggle(date, 'person2')}
-                      className={`w-full py-2 px-3 rounded text-sm font-medium transition ${
-                        dayAttendance?.person2
-                          ? 'bg-[#712ae2] text-white'
-                          : 'bg-[#eaedff] text-[#464555] hover:bg-[#dae2fd]'
-                      }`}
-                    >
-                      {dayAttendance?.person2 ? '✓ Person 2' : 'Person 2'}
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+            <div className="space-y-2">
+              <button
+                onClick={() => onToggle(today, 'person1')}
+                className={`w-full py-2 px-3 rounded text-sm font-medium transition ${
+                  todayAttendance?.person1
+                    ? 'bg-[#483ede] text-white'
+                    : 'bg-[#eaedff] text-[#464555] hover:bg-[#dae2fd]'
+                }`}
+              >
+                {todayAttendance?.person1 ? '✓ Person 1' : 'Person 1'}
+              </button>
+
+              <button
+                onClick={() => onToggle(today, 'person2')}
+                className={`w-full py-2 px-3 rounded text-sm font-medium transition ${
+                  todayAttendance?.person2
+                    ? 'bg-[#712ae2] text-white'
+                    : 'bg-[#eaedff] text-[#464555] hover:bg-[#dae2fd]'
+                }`}
+              >
+                {todayAttendance?.person2 ? '✓ Person 2' : 'Person 2'}
+              </button>
+            </div>
+
+            <p className="mt-3 text-xs text-[#767586]">
+              Attendance can only be marked for today. Past and future dates are locked.
+            </p>
           </div>
         </div>
       )}

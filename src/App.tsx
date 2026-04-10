@@ -20,6 +20,8 @@ interface Attendance {
   person2: boolean;
 }
 
+type AppTab = 'dashboard' | 'transactions' | 'expenses' | 'dealers' | 'payroll' | 'attendance';
+
 interface MonthlyData {
   month: string; // YYYY-MM format
   sales: Sale[];
@@ -40,6 +42,7 @@ function App() {
   const [, setMonthlyData] = useState<MonthlyData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<AppTab>('dashboard');
 
   // Get current month in YYYY-MM format
   const getCurrentMonth = () => {
@@ -144,6 +147,10 @@ function App() {
       [person]: sanitizedAmount
     }));
   }
+
+  const getTodayDate = () => {
+    return new Date().toISOString().split('T')[0];
+  };
 
   async function handleAddSale(quantity: number) {
     if (!supabase) {
@@ -347,6 +354,10 @@ function App() {
   }
 
   async function handleAttendanceToggle(date: string, person: 'person1' | 'person2') {
+    if (date !== getTodayDate()) {
+      return;
+    }
+
     const existingAttendance = attendance.find(a => a.date === date);
     
     let updated: Attendance;
@@ -467,37 +478,72 @@ function App() {
         )}
 
         <DailyStats sales={sales} expenses={expenses} />
-        
-        <QuickAdd onAdd={handleAddSale} isLoading={isLoading} />
-        
-        <ExpenseTracker expenses={expenses} onAdd={handleAddExpense} onDelete={handleDeleteExpense} isLoading={isLoading} />
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2">
-            <TransactionLog sales={sales} dealers={dealers} onDelete={handleDeleteSale} isLoading={isLoading} />
-          </div>
-          <div>
-            <DealerManager dealers={dealers} sales={sales} onAdd={handleAddDealer} onAddBottles={handleAddBottlesByDealer} onDelete={handleDeleteDealer} isLoading={isLoading} />
+
+        <div className="bg-white/95 rounded-xl shadow-lg border border-[#e2e7ff] p-2">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            {[
+              { id: 'dashboard', label: 'Dashboard' },
+              { id: 'transactions', label: 'Transactions' },
+              { id: 'expenses', label: 'Expenses' },
+              { id: 'dealers', label: 'Dealers' },
+              { id: 'payroll', label: 'Payroll' },
+              { id: 'attendance', label: 'Attendance' }
+            ].map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as AppTab)}
+                className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+                  activeTab === tab.id
+                    ? 'primary-gradient text-white'
+                    : 'bg-[#f2f3ff] text-[#464555] hover:bg-[#e2e7ff]'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
-
-        <PayrollSummary 
-          sales={sales} 
-          dealerSales={dealerSales} 
-          expenses={expenses} 
-          salaryPerBottle={SALARY_PER_BOTTLE}
-          attendance={attendance}
-          advances={advances}
-          onAdvanceChange={handleAdvanceChange}
-          advancePin={ADVANCE_PIN}
-          currentMonth={currentMonth}
-        />
         
-        <AttendanceTracker 
-          attendance={attendance} 
-          onToggle={handleAttendanceToggle}
-          currentMonth={currentMonth}
-        />
+        {(activeTab === 'dashboard' || activeTab === 'transactions') && (
+          <QuickAdd onAdd={handleAddSale} isLoading={isLoading} />
+        )}
+        
+        {(activeTab === 'dashboard' || activeTab === 'expenses') && (
+          <ExpenseTracker expenses={expenses} onAdd={handleAddExpense} onDelete={handleDeleteExpense} isLoading={isLoading} />
+        )}
+        
+        {(activeTab === 'dashboard' || activeTab === 'transactions' || activeTab === 'dealers') && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <TransactionLog sales={sales} dealers={dealers} onDelete={handleDeleteSale} isLoading={isLoading} />
+            </div>
+            <div>
+              <DealerManager dealers={dealers} sales={sales} onAdd={handleAddDealer} onAddBottles={handleAddBottlesByDealer} onDelete={handleDeleteDealer} isLoading={isLoading} />
+            </div>
+          </div>
+        )}
+
+        {(activeTab === 'dashboard' || activeTab === 'payroll') && (
+          <PayrollSummary 
+            sales={sales} 
+            dealerSales={dealerSales} 
+            expenses={expenses} 
+            salaryPerBottle={SALARY_PER_BOTTLE}
+            attendance={attendance}
+            advances={advances}
+            onAdvanceChange={handleAdvanceChange}
+            advancePin={ADVANCE_PIN}
+            currentMonth={currentMonth}
+          />
+        )}
+        
+        {(activeTab === 'dashboard' || activeTab === 'attendance') && (
+          <AttendanceTracker 
+            attendance={attendance} 
+            onToggle={handleAttendanceToggle}
+            currentMonth={currentMonth}
+          />
+        )}
       </main>
 
       <footer className="bg-[#eaedff] border-t border-[#dae2fd] text-[#464555] py-5 mt-12">
