@@ -14,22 +14,6 @@ interface AttendanceTrackerProps {
 
 export function AttendanceTracker({ attendance, onToggle, currentMonth }: AttendanceTrackerProps) {
   const [expandMonth, setExpandMonth] = useState(true);
-
-  // Get all dates in current month
-  const getDaysInMonth = () => {
-    const [year, month] = currentMonth.split('-');
-    const date = new Date(parseInt(year), parseInt(month) - 1, 1);
-    const days = [];
-    
-    while (date.getMonth().toString() === (parseInt(month) - 1).toString()) {
-      days.push(new Date(date).toISOString().split('T')[0]);
-      date.setDate(date.getDate() + 1);
-    }
-    
-    return days;
-  };
-
-  const daysInMonth = getDaysInMonth();
   const today = new Date().toISOString().split('T')[0];
   const todayAttendance = attendance.find(a => a.date === today);
 
